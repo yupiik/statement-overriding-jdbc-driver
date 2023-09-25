@@ -1,0 +1,62 @@
+= Statement Overriding JDBC Driver
+:minisite-index: 100
+:minisite-index-title: Getting Started
+:minisite-index-description: Entry point.
+:minisite-index-icon: play
+
+[abstract]
+This custom JDBC Driver aims at enable to rewrite statements on the fly without having to patch the application.
+
+IMPORTANT: as of today this only works for indexed prepared statements and without streaming bindings.
+
+== Installation
+
+Add the following, dependency-free dependency:
+
+[source,xml]
+----
+<dependency>
+  <groupId>io.yupiik.jdbc</groupId>
+  <artifactId>statement-overriding-jdbc-driver</artifactId>
+  <version>${statement-overriding-jdbc-driver.version}</version>
+</dependency>
+----
+
+== Configuration
+
+The configuration of the driver is done thanks a properties file.
+Therefore, the JDBC URL is quite simple and just references the file containing the configuration:
+
+[source]
+----
+jdbc:yupiik:statement-overriding-jdbc-driver:driver=$delegatingDriver;configuration=/path/to/configuration.properties;url=$jdbcUrl
+----
+
+The JDBC driver class - if needed - is: `io.yupiik.jdbc.overriding.Driver`.
+
+TIP: if you need to use `;` in the JDBC URL (`url`) you can replace it by `$semicolon`.
+
+=== Properties configuration
+
+The properties configuration defines the (prepared) statements to rewrite.
+It defines a set of rewritten statements which all have a `sql.matching`, `sql.replacing` keys and a set of `bindings.$number` values which take the new index of the binding or a zero or negative value to ignore it.
+
+For example, the query `select id, name from users where id > ? AND name like ?` can be the matched request,
+it can be rewritten `select id, name from users where name like ? AND id > ? AND id < 1000`.
+Since the bindings are reversed we must set that `bindings.1 = 2` and `bindings.2 = 1`.
+
+Here how it would be configured:
+
+[source,properties]
+----
+findUsers.sql.matching = select id, name from users where id > ? AND name like ?
+findUsers.sql.replacing = select id, name from users where name like ? AND id > ? AND id < 1000
+findUsers.bindings.1 = 2 = select id, name from users where name like ? AND id > ? AND id < 1000
+findUsers.bindings.2 = 1 = select id, name from users where name like ? AND id > ? AND id < 1000
+----
+
+IMPORTANT: the prefix is required, you can't configure a replacement without a prefix ending with a `.` (in previous example `findUsers.`).
+
+IMPORTANT: if a binding is not overriden by `bindings.$index` it will stay at its position.
+
+You can write as much blocks as needed to rewrite all statements.
