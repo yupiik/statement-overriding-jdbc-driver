@@ -21,6 +21,7 @@ import io.yupiik.jdbc.overriding.delegation.DelegatingConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Locale;
 
 public class RewritingConnection extends DelegatingConnection {
     private final RewriteConfiguration configuration;
@@ -32,10 +33,19 @@ public class RewritingConnection extends DelegatingConnection {
 
     @Override
     public PreparedStatement prepareStatement(final String sql) throws SQLException {
-        final var rewriteStatement = sql == null ? null : configuration.configurations().get(sql.strip());
-        if (rewriteStatement == null) {
-            return super.prepareStatement(sql);
+        if (sql == null) {
+            return super.prepareStatement(null);
         }
+
+        final var trimmedSql = sql.strip();
+        var rewriteStatement = configuration.configurations().get(new RewriteConfiguration.Sql(trimmedSql, false, sql.hashCode()));
+        if (rewriteStatement == null) {
+            rewriteStatement = configuration.configurations().get(new RewriteConfiguration.Sql(trimmedSql, true, trimmedSql.toLowerCase(Locale.ROOT).hashCode()));
+            if (rewriteStatement == null) {
+                return super.prepareStatement(sql);
+            }
+        }
+
         return new RewritingPrepareStatement(super.prepareStatement(rewriteStatement.replacement()), rewriteStatement);
     }
 }

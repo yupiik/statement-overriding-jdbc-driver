@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import static java.util.Locale.ROOT;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 import static java.util.logging.Level.SEVERE;
@@ -159,7 +160,7 @@ public class Driver implements java.sql.Driver {
                         (a, b) -> b));
     }
 
-    private Map<String, RewriteConfiguration.RewriteStatement> loadConfiguration(final ClassLoader loader, final String configuration) {
+    private Map<RewriteConfiguration.Sql, RewriteConfiguration.RewriteStatement> loadConfiguration(final ClassLoader loader, final String configuration) {
         if (configuration == null || configuration.isBlank()) {
             return Map.of();
         }
@@ -189,16 +190,24 @@ public class Driver implements java.sql.Driver {
                 .map(String::strip)
                 .toList();
         return keys.stream()
-                .collect(toMap(props::getProperty, key -> {
-                    final var prefix = key.substring(0, key.length() - suffix.length());
-                    final var bindingsPrefix = prefix + ".bindings.";
-                    return new RewriteConfiguration.RewriteStatement(
-                            props.getProperty(prefix + ".sql.replacing", props.getProperty(key)).strip(),
-                            props.stringPropertyNames().stream()
-                                    .filter(b -> b.startsWith(bindingsPrefix))
-                                    .collect(toMap(i -> Integer.parseInt(i.substring(bindingsPrefix.length()).strip()), i -> Integer.parseInt(props.getProperty(i).strip())))
-                    );
-                }));
+                .collect(toMap(
+                        key -> {
+                            final var sql = props.getProperty(key);
+                            final var ignoreCase = Boolean.parseBoolean(props.getProperty(key.substring(0, key.length() - suffix.length()), "true"));
+                            return new RewriteConfiguration.Sql(
+                                    sql, ignoreCase,
+                                    ignoreCase ? sql.toLowerCase(ROOT).hashCode() : sql.hashCode());
+                        },
+                        key -> {
+                            final var prefix = key.substring(0, key.length() - suffix.length());
+                            final var bindingsPrefix = prefix + ".bindings.";
+                            return new RewriteConfiguration.RewriteStatement(
+                                    props.getProperty(prefix + ".sql.replacing", props.getProperty(key)).strip(),
+                                    props.stringPropertyNames().stream()
+                                            .filter(b -> b.startsWith(bindingsPrefix))
+                                            .collect(toMap(i -> Integer.parseInt(i.substring(bindingsPrefix.length()).strip()), i -> Integer.parseInt(props.getProperty(i).strip())))
+                            );
+                        }));
     }
 
     private record UrlData(java.sql.Driver driver, String url, RewriteConfiguration configuration) {

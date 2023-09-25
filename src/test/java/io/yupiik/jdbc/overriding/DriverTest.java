@@ -65,6 +65,22 @@ class DriverTest {
     }
 
     @Test
+    void rewritePreparedStatementIgnoreCase() throws SQLException {
+        try (final var h2 = DriverManager.getConnection("jdbc:h2:mem:rewritePreparedStatement", "sa", "")) {
+            // seed the db
+            seedUsers(h2);
+
+            // using wrapping driver
+            try (final var wrapper = DriverManager.getConnection(
+                    "jdbc:yupiik:statement-overriding-jdbc-driver:driver=" + Driver.class.getName() + ";url=jdbc:h2:mem:rewritePreparedStatement;configuration=DriverTest.properties", "sa", "");
+                 final var stmt = wrapper.prepareStatement("SELECT id, name FROM some_users");
+                 final var set = stmt.executeQuery()) {
+                assertEquals(Map.of("0002", "user 2"), asMap(set));
+            }
+        }
+    }
+
+    @Test
     void rewritePreparedStatementWithBinding() throws SQLException {
         try (final var h2 = DriverManager.getConnection("jdbc:h2:mem:rewritePreparedStatement", "sa", "")) {
             // seed the db

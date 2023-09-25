@@ -16,8 +16,26 @@
 package io.yupiik.jdbc.overriding;
 
 import java.util.Map;
+import java.util.Objects;
 
-public record RewriteConfiguration(Map<String, RewriteStatement> configurations) {
+public record RewriteConfiguration(Map<Sql, RewriteStatement> configurations) {
+    public record Sql(String raw, boolean ignoreCase, int hash) {
+        @Override
+        public boolean equals(final Object obj) {
+            return obj == this || (
+                    obj instanceof Sql s &&
+                            s.ignoreCase() == ignoreCase() &&
+                            (ignoreCase ?
+                                    raw().equalsIgnoreCase(s.raw()) :
+                                    Objects.equals(raw(), s.raw())));
+        }
+
+        @Override
+        public int hashCode() {
+            return hash;
+        }
+    }
+
     public record RewriteStatement(String replacement, Map<Integer, Integer> bindingIndices) {
     }
 }

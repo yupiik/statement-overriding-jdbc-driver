@@ -60,3 +60,5 @@ IMPORTANT: the prefix is required, you can't configure a replacement without a p
 IMPORTANT: if a binding is not overriden by `bindings.$index` it will stay at its position.
 
 You can write as much blocks as needed to rewrite all statements.
+
+If you need to force the case for the `matching` statement, you can add `$prefix.respectCase = true`, else the matching will be done case insensitively.
