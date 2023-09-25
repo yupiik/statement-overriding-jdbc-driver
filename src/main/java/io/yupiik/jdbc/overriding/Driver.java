@@ -38,6 +38,7 @@ import static java.util.Locale.ROOT;
 import static java.util.Objects.requireNonNull;
 import static java.util.Optional.ofNullable;
 import static java.util.logging.Level.SEVERE;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 public class Driver implements java.sql.Driver {
@@ -68,7 +69,7 @@ public class Driver implements java.sql.Driver {
         if (cached != null) {
             final var existing = cached.get();
             if (existing != null) {
-                return new RewritingConnection(existing.driver().connect(existing.url(), info), existing.configuration());
+                return new RewritingConnection(existing.driver.connect(existing.url, info), existing.configuration);
             }
         }
 
@@ -81,7 +82,7 @@ public class Driver implements java.sql.Driver {
                     newDriver(delegatingUrl, parsed, loader), delegatingUrl,
                     new RewriteConfiguration(loadConfiguration(loader, parsed.get("configuration"))));
             CACHE.put(url, new WeakReference<>(urlData));
-            return new RewritingConnection(urlData.driver().connect(delegatingUrl, info), urlData.configuration());
+            return new RewritingConnection(urlData.driver.connect(delegatingUrl, info), urlData.configuration);
         } catch (final SQLException e) {
             throw new IllegalArgumentException(e);
         }
@@ -160,7 +161,8 @@ public class Driver implements java.sql.Driver {
                         (a, b) -> b));
     }
 
-    private Map<RewriteConfiguration.Sql, RewriteConfiguration.RewriteStatement> loadConfiguration(final ClassLoader loader, final String configuration) {
+    private Map<RewriteConfiguration.Sql, RewriteConfiguration.RewriteStatement> loadConfiguration(
+            final ClassLoader loader, final String configuration) {
         if (configuration == null || configuration.isBlank()) {
             return Map.of();
         }
@@ -188,7 +190,7 @@ public class Driver implements java.sql.Driver {
         final var keys = props.stringPropertyNames().stream()
                 .filter(k -> k.endsWith(suffix))
                 .map(String::strip)
-                .toList();
+                .collect(toList());
         return keys.stream()
                 .collect(toMap(
                         key -> {
@@ -210,6 +212,15 @@ public class Driver implements java.sql.Driver {
                         }));
     }
 
-    private record UrlData(java.sql.Driver driver, String url, RewriteConfiguration configuration) {
+    private static class UrlData {
+        private final java.sql.Driver driver;
+        private final String url;
+        private final RewriteConfiguration configuration;
+
+        private UrlData(final java.sql.Driver driver, final String url, final RewriteConfiguration configuration) {
+            this.driver = driver;
+            this.url = url;
+            this.configuration = configuration;
+        }
     }
 }

@@ -18,24 +18,69 @@ package io.yupiik.jdbc.overriding;
 import java.util.Map;
 import java.util.Objects;
 
-public record RewriteConfiguration(Map<Sql, RewriteStatement> configurations) {
-    public record Sql(String raw, boolean ignoreCase, int hash) {
+public class RewriteConfiguration {
+    private final Map<Sql, RewriteStatement> configurations;
+
+    public RewriteConfiguration(final Map<Sql, RewriteStatement> configurations) {
+        this.configurations = configurations;
+    }
+
+    public Map<Sql, RewriteStatement> configurations() {
+        return configurations;
+    }
+
+    public static class Sql {
+        private final String raw;
+        private final boolean ignoreCase;
+        private final int hash;
+
+        public Sql(final String raw, final boolean ignoreCase, final int hash) {
+            this.raw = raw;
+            this.ignoreCase = ignoreCase;
+            this.hash = hash;
+        }
+
+        public String raw() {
+            return raw;
+        }
+
+        public boolean ignoreCase() {
+            return ignoreCase;
+        }
+
         @Override
         public boolean equals(final Object obj) {
-            return obj == this || (
-                    obj instanceof Sql s &&
-                            s.ignoreCase() == ignoreCase() &&
-                            (ignoreCase ?
-                                    raw().equalsIgnoreCase(s.raw()) :
-                                    Objects.equals(raw(), s.raw())));
+            return obj == this || (obj instanceof Sql && isEquals((Sql) obj));
         }
 
         @Override
         public int hashCode() {
             return hash;
         }
+
+        private boolean isEquals(final Sql s) {
+            return s.ignoreCase == ignoreCase &&
+                    (ignoreCase ?
+                            raw.equalsIgnoreCase(s.raw) :
+                            Objects.equals(raw, s.raw));
+        }
     }
 
-    public record RewriteStatement(String replacement, Map<Integer, Integer> bindingIndices) {
+    public static class RewriteStatement {
+        private final String replacement;
+        private final Map<Integer, Integer> bindingIndices;
+
+        public RewriteStatement(final String replacement, final Map<Integer, Integer> bindingIndices) {
+            this.replacement = replacement;
+            this.bindingIndices = bindingIndices;
+        }
+
+        public String replacement() {
+            return replacement;
+        }
+
+        public Map<Integer, Integer> bindingIndices() {
+            return bindingIndices;
+        }
     }
 }
