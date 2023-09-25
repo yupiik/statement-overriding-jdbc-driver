@@ -107,252 +107,402 @@ public class RewritingPrepareStatement extends DelegatingPreparedStatement {
 
     @Override
     public void setNull(final int parameterIndex, final int sqlType) {
-        bindings.add(() -> super.setNull(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), sqlType));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setNull(index, sqlType));
+        }
     }
 
     @Override
     public void setBoolean(final int parameterIndex, final boolean x) {
-        bindings.add(() -> super.setBoolean(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setBoolean(index, x));
+        }
     }
 
     @Override
     public void setByte(final int parameterIndex, final byte x) {
-        bindings.add(() -> super.setByte(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setByte(index, x));
+        }
     }
 
     @Override
     public void setShort(final int parameterIndex, final short x) {
-        bindings.add(() -> super.setShort(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setShort(index, x));
+        }
     }
 
     @Override
     public void setInt(final int parameterIndex, final int x) {
-        bindings.add(() -> super.setInt(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setInt(index, x));
+        }
     }
 
     @Override
     public void setLong(final int parameterIndex, final long x) {
-        bindings.add(() -> super.setLong(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setLong(index, x));
+        }
     }
 
     @Override
     public void setFloat(final int parameterIndex, final float x) {
-        bindings.add(() -> super.setFloat(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setFloat(index, x));
+        }
     }
 
     @Override
     public void setDouble(final int parameterIndex, final double x) {
-        bindings.add(() -> super.setDouble(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setDouble(index, x));
+        }
     }
 
     @Override
     public void setBigDecimal(final int parameterIndex, final BigDecimal x) {
-        bindings.add(() -> super.setBigDecimal(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setBigDecimal(index, x));
+        }
     }
 
     @Override
     public void setString(final int parameterIndex, final String x) {
-        bindings.add(() -> super.setString(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setString(index, x));
+        }
     }
 
     @Override
     public void setBytes(final int parameterIndex, final byte[] x) {
-        bindings.add(() -> super.setBytes(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setBytes(index, x));
+        }
     }
 
     @Override
     public void setDate(final int parameterIndex, final Date x) {
-        bindings.add(() -> super.setDate(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setDate(index, x));
+        }
     }
 
     @Override
     public void setTime(final int parameterIndex, final Time x) {
-        bindings.add(() -> super.setTime(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setTime(index, x));
+        }
     }
 
     @Override
     public void setTimestamp(final int parameterIndex, final Timestamp x) {
-        bindings.add(() -> super.setTimestamp(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setTimestamp(index, x));
+        }
     }
 
     @Override
     public void setAsciiStream(final int parameterIndex, final InputStream x, final int length) {
-        bindings.add(() -> super.setAsciiStream(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setAsciiStream(index, x));
+        }
     }
 
     @Override
     public void setUnicodeStream(final int parameterIndex, final InputStream x, final int length) {
-        bindings.add(() -> super.setUnicodeStream(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x, length));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setUnicodeStream(index, x, length));
+        }
     }
 
     @Override
     public void setBinaryStream(final int parameterIndex, final InputStream x, final int length) {
-        bindings.add(() -> super.setBinaryStream(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x, length));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setBinaryStream(index, x, length));
+        }
     }
 
     @Override
     public void setObject(final int parameterIndex, final Object x, final int targetSqlType) {
-        bindings.add(() -> super.setObject(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x, targetSqlType));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setObject(index, x, targetSqlType));
+        }
     }
 
     @Override
     public void setObject(final int parameterIndex, final Object x) {
-        bindings.add(() -> super.setObject(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setObject(index, x));
+        }
     }
 
     @Override
     public void setCharacterStream(final int parameterIndex, final Reader reader, final int length) {
-        bindings.add(() -> super.setCharacterStream(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), reader, length));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setCharacterStream(index, reader, length));
+        }
     }
 
     @Override
     public void setRef(final int parameterIndex, final Ref x) {
-        bindings.add(() -> super.setRef(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setRef(index, x));
+        }
     }
 
     @Override
     public void setBlob(final int parameterIndex, final Blob x) {
-        bindings.add(() -> super.setBlob(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setBlob(index, x));
+        }
     }
 
     @Override
     public void setClob(final int parameterIndex, final Clob x) {
-        bindings.add(() -> super.setClob(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setClob(index, x));
+        }
     }
 
     @Override
     public void setArray(final int parameterIndex, final Array x) {
-        bindings.add(() -> super.setArray(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setArray(index, x));
+        }
     }
 
     @Override
     public void setDate(final int parameterIndex, final Date x, final Calendar cal) {
-        bindings.add(() -> super.setDate(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x, cal));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setDate(index, x, cal));
+        }
     }
 
     @Override
     public void setTime(final int parameterIndex, final Time x, final Calendar cal) {
-        bindings.add(() -> super.setTime(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x, cal));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setTime(index, x, cal));
+        }
     }
 
     @Override
     public void setTimestamp(final int parameterIndex, final Timestamp x, final Calendar cal) {
-        bindings.add(() -> super.setTimestamp(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x, cal));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setTimestamp(index, x, cal));
+        }
     }
 
     @Override
     public void setNull(final int parameterIndex, final int sqlType, final String typeName) {
-        bindings.add(() -> super.setNull(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), sqlType, typeName));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setNull(index, sqlType, typeName));
+        }
     }
 
     @Override
     public void setURL(final int parameterIndex, final URL x) {
-        bindings.add(() -> super.setURL(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setURL(index, x));
+        }
     }
 
     @Override
     public void setRowId(final int parameterIndex, final RowId x) {
-        bindings.add(() -> super.setRowId(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setRowId(index, x));
+        }
     }
 
     @Override
     public void setNString(final int parameterIndex, final String value) {
-        bindings.add(() -> super.setNString(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), value));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setNString(index, value));
+        }
     }
 
     @Override
     public void setNCharacterStream(final int parameterIndex, final Reader value, final long length) {
-        bindings.add(() -> super.setNCharacterStream(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), Reader.nullReader(), length));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setNCharacterStream(index, Reader.nullReader(), length));
+        }
     }
 
     @Override
     public void setNClob(final int parameterIndex, final NClob value) {
-        bindings.add(() -> super.setNClob(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), value));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setNClob(index, value));
+        }
     }
 
     @Override
     public void setClob(final int parameterIndex, final Reader reader, final long length) {
-        bindings.add(() -> super.setClob(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), reader, length));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setClob(index, reader, length));
+        }
     }
 
     @Override
     public void setBlob(final int parameterIndex, final InputStream inputStream, final long length) {
-        bindings.add(() -> super.setBlob(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), inputStream, length));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setBlob(index, inputStream, length));
+        }
     }
 
     @Override
     public void setNClob(final int parameterIndex, final Reader reader, final long length) {
-        bindings.add(() -> super.setNClob(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), reader, length));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setNClob(index, reader, length));
+        }
     }
 
     @Override
     public void setSQLXML(final int parameterIndex, final SQLXML xmlObject) {
-        bindings.add(() -> super.setSQLXML(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), xmlObject));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setSQLXML(index, xmlObject));
+        }
     }
 
     @Override
     public void setObject(final int parameterIndex, final Object x, final int targetSqlType, final int scaleOrLength) {
-        bindings.add(() -> super.setObject(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x, targetSqlType, scaleOrLength));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setObject(index, x, targetSqlType, scaleOrLength));
+        }
     }
 
     @Override
     public void setAsciiStream(final int parameterIndex, final InputStream x, final long length) {
-        bindings.add(() -> super.setAsciiStream(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x, length));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setAsciiStream(index, x, length));
+        }
     }
 
     @Override
     public void setBinaryStream(final int parameterIndex, final InputStream x, final long length) {
-        bindings.add(() -> super.setBinaryStream(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x, length));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setBinaryStream(index, x, length));
+        }
     }
 
     @Override
     public void setCharacterStream(final int parameterIndex, final Reader reader, final long length) {
-        bindings.add(() -> super.setCharacterStream(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), reader, length));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setCharacterStream(index, reader, length));
+        }
     }
 
     @Override
     public void setAsciiStream(final int parameterIndex, final InputStream x) {
-        bindings.add(() -> super.setAsciiStream(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setAsciiStream(index, x));
+        }
     }
 
     @Override
     public void setBinaryStream(final int parameterIndex, final InputStream x) {
-        bindings.add(() -> super.setBinaryStream(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setBinaryStream(index, x));
+        }
     }
 
     @Override
     public void setCharacterStream(final int parameterIndex, final Reader reader) {
-        bindings.add(() -> super.setCharacterStream(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), reader));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setCharacterStream(index, reader));
+        }
     }
 
     @Override
     public void setNCharacterStream(final int parameterIndex, final Reader value) {
-        bindings.add(() -> super.setNCharacterStream(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), value));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setNCharacterStream(index, value));
+        }
     }
 
     @Override
     public void setClob(final int parameterIndex, final Reader reader) {
-        bindings.add(() -> super.setClob(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), reader));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setClob(index, reader));
+        }
     }
 
     @Override
     public void setBlob(final int parameterIndex, final InputStream inputStream) {
-        bindings.add(() -> super.setBlob(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), inputStream));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setBlob(index, inputStream));
+        }
     }
 
     @Override
     public void setNClob(final int parameterIndex, final Reader reader) {
-        bindings.add(() -> super.setNClob(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), reader));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setNClob(index, reader));
+        }
     }
 
     @Override
     public void setObject(final int parameterIndex, final Object x, final SQLType targetSqlType, final int scaleOrLength) {
-        bindings.add(() -> super.setObject(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x, targetSqlType, scaleOrLength));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setObject(index, x, targetSqlType, scaleOrLength));
+        }
     }
 
     @Override
     public void setObject(final int parameterIndex, final Object x, final SQLType targetSqlType) {
-        bindings.add(() -> super.setObject(configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex), x, targetSqlType));
+        final var index = configuration.bindingIndices().getOrDefault(parameterIndex, parameterIndex);
+        if (index > 0) {
+            bindings.add(() -> super.setObject(index, x, targetSqlType));
+        }
     }
 
     @FunctionalInterface
