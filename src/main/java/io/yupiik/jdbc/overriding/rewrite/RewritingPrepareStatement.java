@@ -45,7 +45,8 @@ public class RewritingPrepareStatement extends DelegatingPreparedStatement {
 
     private final List<SQLRunnable> bindings = new ArrayList<>();
 
-    public RewritingPrepareStatement(final PreparedStatement preparedStatement, final RewriteConfiguration.RewriteStatement configuration) {
+    public RewritingPrepareStatement(final PreparedStatement preparedStatement,
+                                     final RewriteConfiguration.RewriteStatement configuration) {
         super(preparedStatement);
         this.configuration = configuration;
     }
@@ -93,7 +94,11 @@ public class RewritingPrepareStatement extends DelegatingPreparedStatement {
     @Override
     public ResultSet executeQuery() throws SQLException {
         onAllBound();
-        return super.executeQuery();
+        final var resultSet = super.executeQuery();
+        if (configuration.resultSetIndexOverride() != null || configuration.resultSetNameOverride() != null) {
+            return new RemappingResultSet(resultSet, configuration.resultSetIndexOverride(), configuration.resultSetNameOverride());
+        }
+        return resultSet;
     }
 
     @Override

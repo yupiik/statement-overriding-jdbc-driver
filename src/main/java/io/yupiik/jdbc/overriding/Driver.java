@@ -203,12 +203,20 @@ public class Driver implements java.sql.Driver {
                         key -> {
                             final var prefix = key.substring(0, key.length() - suffix.length());
                             final var bindingsPrefix = prefix + ".bindings.";
+                            final var resultSetPrefix = prefix + ".resultset.";
+                            final var resultSetIndicesPrefix = resultSetPrefix + "index.";
+                            final var resultSetNamesPrefix = resultSetPrefix + "name.";
                             return new RewriteConfiguration.RewriteStatement(
                                     props.getProperty(prefix + ".sql.replacing", props.getProperty(key)).strip(),
                                     props.stringPropertyNames().stream()
                                             .filter(b -> b.startsWith(bindingsPrefix))
-                                            .collect(toMap(i -> Integer.parseInt(i.substring(bindingsPrefix.length()).strip()), i -> Integer.parseInt(props.getProperty(i).strip())))
-                            );
+                                            .collect(toMap(i -> Integer.parseInt(i.substring(bindingsPrefix.length()).strip()), i -> Integer.parseInt(props.getProperty(i).strip()))),
+                                    props.stringPropertyNames().stream()
+                                            .filter(b -> b.startsWith(resultSetIndicesPrefix))
+                                            .collect(toMap(i -> Integer.parseInt(i.substring(resultSetIndicesPrefix.length()).strip()), i -> Integer.parseInt(props.getProperty(i).strip()))),
+                                    props.stringPropertyNames().stream()
+                                            .filter(b -> b.startsWith(resultSetNamesPrefix))
+                                            .collect(toMap(i -> i.substring(resultSetNamesPrefix.length()).strip(), i -> props.getProperty(i).strip())));
                         }));
     }
 

@@ -51,8 +51,8 @@ Here how it would be configured:
 ----
 findUsers.sql.matching = select id, name from users where id > ? AND name like ?
 findUsers.sql.replacing = select id, name from users where name like ? AND id > ? AND id < 1000
-findUsers.bindings.1 = 2 = select id, name from users where name like ? AND id > ? AND id < 1000
-findUsers.bindings.2 = 1 = select id, name from users where name like ? AND id > ? AND id < 1000
+findUsers.bindings.1 = 2
+findUsers.bindings.2 = 1
 ----
 
 IMPORTANT: the prefix is required, you can't configure a replacement without a prefix ending with a `.` (in previous example `findUsers.`).
@@ -62,3 +62,29 @@ IMPORTANT: if a binding is not overriden by `bindings.$index` it will stay at it
 You can write as much blocks as needed to rewrite all statements.
 
 If you need to force the case for the `matching` statement, you can add `$prefix.respectCase = true`, else the matching will be done case insensitively.
+
+==== Remap the result set columns
+
+It is possible to remap the result set columns, this is mainly useful when one column is duplicated and you want to avoid to bring it twice (to save network bandwidth).
+
+To do that, add to the SQL rewrite configuration the following properties:
+
+[source,properties]
+----
+$rewriteName.resultset.index.$indexValue = $newIndexValue
+$rewriteName.resultset.name.$originalName = $newName
+----
+
+For example:
+
+[source,properties]
+----
+findUsers.sql.matching = select id, name from users where id > ? AND name like ?
+findUsers.sql.replacing = select id2, name from users where name like ? AND id > ? AND id < 1000
+findUsers.bindings.1 = 2
+findUsers.bindings.2 = 1
+findUsers.resultset.index.1 = 1
+findUsers.resultset.index.2 = 2
+findUsers.resultset.name.id = id2 # remap id as id2
+findUsers.resultset.name.name = name
+----

@@ -69,10 +69,23 @@ public class RewriteConfiguration {
     public static class RewriteStatement {
         private final String replacement;
         private final Map<Integer, Integer> bindingIndices;
+        private final Map<Integer, Integer> resultSetIndexOverride;
+        private final Map<String, String> resultSetNameOverride;
 
-        public RewriteStatement(final String replacement, final Map<Integer, Integer> bindingIndices) {
+        public RewriteStatement(final String replacement, final Map<Integer, Integer> bindingIndices,
+                                final Map<Integer, Integer> resultSetIndexOverride, final Map<String, String> resultSetNameOverride) {
             this.replacement = replacement;
             this.bindingIndices = bindingIndices;
+            this.resultSetIndexOverride = resultSetIndexOverride;
+            this.resultSetNameOverride = resultSetNameOverride;
+        }
+
+        public Map<Integer, Integer> resultSetIndexOverride() {
+            return resultSetIndexOverride;
+        }
+
+        public Map<String, String> resultSetNameOverride() {
+            return resultSetNameOverride;
         }
 
         public String replacement() {
