@@ -38,14 +38,32 @@ public class RewritingConnection extends DelegatingConnection {
         }
 
         final var trimmedSql = sql.strip();
-        var rewriteStatement = configuration.configurations().get(new RewriteConfiguration.Sql(trimmedSql, false, sql.hashCode()));
-        if (rewriteStatement == null) {
-            rewriteStatement = configuration.configurations().get(new RewriteConfiguration.Sql(trimmedSql, true, trimmedSql.toLowerCase(Locale.ROOT).hashCode()));
-            if (rewriteStatement == null) {
-                return super.prepareStatement(sql);
+        final var matched = findMatchingRewrite(trimmedSql);
+        if (matched == null) {
+            return super.prepareStatement(sql);
+        }
+
+        return new RewritingPrepareStatement(super.prepareStatement(matched.sql()), matched.configuration());
+    }
+
+    private MatchedRewriting findMatchingRewrite(final String sql) {
+        { // exact case
+            final var rewriteStatement = configuration.configurations()
+                    .get(new RewriteConfiguration.Sql(sql, false, sql.hashCode()));
+            if (rewriteStatement != null) {
+                return new MatchedRewriting(rewriteStatement.replacement(), rewriteStatement);
             }
         }
 
-        return new RewritingPrepareStatement(super.prepareStatement(rewriteStatement.replacement()), rewriteStatement);
+        { // case insensitive
+            final var rewriteStatement = configuration.configurations()
+                    .get(new RewriteConfiguration.Sql(sql, true, sql.toLowerCase(Locale.ROOT).hashCode()));
+            if (rewriteStatement != null) {
+                return new MatchedRewriting(rewriteStatement.replacement(), rewriteStatement);
+            }
+        }
+
+        // regex (slower so last)
+        return configuration.tryRewriteUsingRegexes(sql);
     }
 }

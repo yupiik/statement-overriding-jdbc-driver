@@ -63,6 +63,9 @@ You can write as much blocks as needed to rewrite all statements.
 
 If you need to force the case for the `matching` statement, you can add `$prefix.respectCase = true`, else the matching will be done case insensitively.
 
+The configuration also takes the property `type` which enables to switch between the default `PLAIN` which will use `replacing` property value to replace the query and `REGEX` which will consider
+`matching` as a regex with captures usable in `replacing` string.
+
 ==== Remap the result set columns
 
 It is possible to remap the result set columns, this is mainly useful when one column is duplicated and you want to avoid to bring it twice (to save network bandwidth).

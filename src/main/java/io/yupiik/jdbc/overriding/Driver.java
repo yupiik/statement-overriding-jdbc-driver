@@ -211,6 +211,7 @@ public class Driver implements java.sql.Driver {
                                     props.stringPropertyNames().stream()
                                             .filter(b -> b.startsWith(bindingsPrefix))
                                             .collect(toMap(i -> Integer.parseInt(i.substring(bindingsPrefix.length()).strip()), i -> Integer.parseInt(props.getProperty(i).strip()))),
+                                    RewriteConfiguration.RewriteType.valueOf(props.getProperty(prefix + ".type", "PLAIN")),
                                     props.stringPropertyNames().stream()
                                             .filter(b -> b.startsWith(resultSetIndicesPrefix))
                                             .collect(toMap(i -> Integer.parseInt(i.substring(resultSetIndicesPrefix.length()).strip()), i -> Integer.parseInt(props.getProperty(i).strip()))),

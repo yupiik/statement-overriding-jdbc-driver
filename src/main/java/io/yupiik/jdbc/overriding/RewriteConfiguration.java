@@ -15,21 +15,46 @@
  */
 package io.yupiik.jdbc.overriding;
 
+import io.yupiik.jdbc.overriding.rewrite.MatchedRewriting;
+
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
+
+import static io.yupiik.jdbc.overriding.RewriteConfiguration.RewriteType.REGEX;
+import static java.util.stream.Collectors.toMap;
 
 public class RewriteConfiguration {
     private final Map<Sql, RewriteStatement> configurations;
+    private final Map<Pattern, RewriteStatement> regexes;
 
     public RewriteConfiguration(final Map<Sql, RewriteStatement> configurations) {
         this.configurations = configurations;
+        this.regexes = configurations.entrySet().stream()
+                .filter(i -> i.getValue().type() == REGEX)
+                .collect(toMap(i -> Pattern.compile(i.getKey().raw()), Map.Entry::getValue));
     }
 
     public Map<Sql, RewriteStatement> configurations() {
         return configurations;
     }
 
-    public static class Sql {
+    public MatchedRewriting tryRewriteUsingRegexes(final String sql) {
+        if (regexes.isEmpty()) {
+            return null;
+        }
+
+        for (final var entry : regexes.entrySet()) {
+            final var matcher = entry.getKey().matcher(sql);
+            if (matcher.matches()) {
+                return new MatchedRewriting(matcher.replaceFirst(entry.getValue().replacement()), entry.getValue());
+            }
+        }
+        return null;
+    }
+
+    public static class Sql implements Predicate<Sql> {
         private final String raw;
         private final boolean ignoreCase;
         private final int hash;
@@ -64,6 +89,11 @@ public class RewriteConfiguration {
                             raw.equalsIgnoreCase(s.raw) :
                             Objects.equals(raw, s.raw));
         }
+
+        @Override
+        public boolean test(final Sql sql) {
+            return equals(sql);
+        }
     }
 
     public static class RewriteStatement {
@@ -71,13 +101,19 @@ public class RewriteConfiguration {
         private final Map<Integer, Integer> bindingIndices;
         private final Map<Integer, Integer> resultSetIndexOverride;
         private final Map<String, String> resultSetNameOverride;
+        private final RewriteType type;
 
-        public RewriteStatement(final String replacement, final Map<Integer, Integer> bindingIndices,
+        public RewriteStatement(final String replacement, final Map<Integer, Integer> bindingIndices, final RewriteType type,
                                 final Map<Integer, Integer> resultSetIndexOverride, final Map<String, String> resultSetNameOverride) {
             this.replacement = replacement;
             this.bindingIndices = bindingIndices;
             this.resultSetIndexOverride = resultSetIndexOverride;
             this.resultSetNameOverride = resultSetNameOverride;
+            this.type = type;
+        }
+
+        public RewriteType type() {
+            return type;
         }
 
         public Map<Integer, Integer> resultSetIndexOverride() {
@@ -88,12 +124,16 @@ public class RewriteConfiguration {
             return resultSetNameOverride;
         }
 
-        public String replacement() {
-            return replacement;
-        }
-
         public Map<Integer, Integer> bindingIndices() {
             return bindingIndices;
         }
+
+        public String replacement() {
+            return replacement;
+        }
+    }
+
+    public enum RewriteType {
+        PLAIN, REGEX
     }
 }

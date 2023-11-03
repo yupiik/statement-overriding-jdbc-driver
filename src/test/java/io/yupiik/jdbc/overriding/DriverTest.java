@@ -148,6 +148,37 @@ class DriverTest {
     }
 
     @Test
+    void rewritePreparedStatementRegex() throws SQLException {
+        try (final var h2 = DriverManager.getConnection("jdbc:h2:mem:rewritePreparedStatement", "sa", "")) {
+            // seed the db
+            try (final var stmt = h2.createStatement()) {
+                stmt.execute("create table some_users(id varchar(16), name varchar(255), type varchar(1))");
+                stmt.execute("insert into some_users(id, name, type) values('0001', 'user 1', 'A')");
+                stmt.execute("insert into some_users(id, name, type) values('0002', 'user 2', 'B')");
+                stmt.execute("insert into some_users(id, name, type) values('0003', 'user 3', 'B')");
+                stmt.execute("insert into some_users(id, name, type) values('0004', 'user 4', 'B')");
+                stmt.execute("insert into some_users(id, name, type) values('0005', 'user 5', 'A')");
+            }
+
+            // using wrapping driver
+            try (final var wrapper = DriverManager.getConnection(
+                    "jdbc:yupiik:statement-overriding-jdbc-driver:driver=" + Driver.class.getName() + ";url=jdbc:h2:mem:rewritePreparedStatement;configuration=DriverTest.properties", "sa", "");
+                 final var stmt = wrapper.prepareStatement("select foo as id, bar as name from some_users where id = ? and type = ?")) {
+                stmt.setString(1, "000%");
+                stmt.setString(2, "B");
+                try (final var set = stmt.executeQuery()) {
+                    assertEquals(
+                            Map.of(
+                                    "0002", "user 2",
+                                    "0003", "user 3",
+                                    "0004", "user 4"),
+                            asMap(set));
+                }
+            }
+        }
+    }
+
+    @Test
     void noopStatement() throws SQLException {
         try (final var h2 = DriverManager.getConnection("jdbc:h2:mem:rewriteStatement", "sa", "")) {
             // seed the db
