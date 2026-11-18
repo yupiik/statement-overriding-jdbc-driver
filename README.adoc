@@ -140,7 +140,7 @@ findUsers.resultset.name.id = id2
 In this example, code reading column `id` by name reads the delegated column `id2`.
 Only entries that differ from the identity mapping are needed.
 
-== Build and documentation
+== Build and source
 
 Run the tests with Maven:
 
@@ -164,7 +164,6 @@ mvn clean package -Pgh-pages
 ----
 
 * https://github.com/yupiik/statement-overriding-jdbc-driver[Source repository]
-* https://yupiik.github.io/statement-overriding-jdbc-driver/[Project documentation]
 
 == License
 
