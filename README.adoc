@@ -1,0 +1,171 @@
+= Statement Overriding JDBC Driver
+
+[abstract]
+A JDBC driver that wraps another JDBC driver and rewrites prepared statements on the fly, without patching the application.
+
+The driver is useful when an application or a library issues SQL that cannot be changed easily, but the database needs a different statement shape or different column labels.
+It rewrites `Connection.prepareStatement(String)` calls using a properties file and delegates everything else to the underlying driver.
+
+== Current limitations
+
+* Only `Connection.prepareStatement(String)` is rewritten.
+* Plain `Statement` queries and the other `prepareStatement` overloads are delegated unchanged.
+* Parameter bindings are replayed when the statement is executed, so streaming bindings are not supported.
+* Result-set values can be remapped, but `ResultSetMetaData` is delegated unchanged.
+* Regular-expression rewrites match the full SQL string with `Matcher.matches()`.
+
+== Installation
+
+The runtime artifact has no compile dependencies.
+
+[source,xml]
+----
+<dependency>
+  <groupId>io.yupiik.jdbc</groupId>
+  <artifactId>statement-overriding-jdbc-driver</artifactId>
+  <version>0.0.3</version>
+</dependency>
+----
+
+NOTE: `0.0.3` is the latest released version at the time of writing.
+The POM is currently on `0.0.4-SNAPSHOT`, so update this snippet when the next release is published.
+
+The project targets Java 11.
+
+== Usage
+
+The driver is registered with `java.sql.DriverManager` through the JDBC service loader, so no explicit class loading is normally needed.
+If your container requires the class name, use `io.yupiik.jdbc.overriding.Driver`.
+
+[source,text]
+----
+jdbc:yupiik:statement-overriding-jdbc-driver:driver=<delegatingDriver>;configuration=<configurationFile>;url=<delegatingUrl>
+----
+
+The `driver` value is the fully qualified class name of the JDBC driver to wrap.
+The `url` value is passed to that driver when a connection is opened.
+The `configuration` value points to the properties file that defines the rewrites.
+
+The configuration value is first treated as a filesystem path.
+If no file exists at that path, it is loaded as a classpath resource.
+Omit `configuration` to delegate all statements unchanged.
+
+TIP: Replace `;` characters inside `url` with `$semicolon` so they are not treated as driver URL argument separators.
+
+Credentials are passed as usual to `DriverManager.getConnection` and are forwarded to the delegating driver.
+
+[source,java]
+----
+try (final var connection = DriverManager.getConnection(
+        "jdbc:yupiik:statement-overriding-jdbc-driver:driver=org.h2.Driver;configuration=rewrites.properties;url=jdbc:h2:mem:test",
+        "sa",
+        "")) {
+    // use the connection
+}
+----
+
+== How it works
+
+When a connection is opened, the driver creates a delegated connection with the configured driver and URL.
+For each `prepareStatement(String)` call, the driver strips surrounding whitespace and looks for a configured rewrite.
+If no rewrite matches, the original SQL is passed to the delegated connection.
+If a rewrite matches, the replacement SQL is prepared and a wrapper applies the binding and result-set overrides.
+
+Exact-case matches are checked first, then case-insensitive matches, then regular expressions.
+
+== Configuration
+
+The configuration file defines one block per rewrite.
+Each rewrite has a prefix, such as `findUsersByType`, and its property keys start with `<prefix>.`.
+
+[cols="1,1,2", options="header"]
+|===
+| Key | Default | Description
+| `<prefix>.sql.matching` | required | The SQL text to match.
+| `<prefix>.sql.replacing` | matching SQL | The SQL text passed to the delegated `prepareStatement` call.
+| `<prefix>` | `true` | Whether matching ignores case for this block.
+| `<prefix>.type` | `PLAIN` | The rewrite mode, either `PLAIN` or `REGEX`.
+| `<prefix>.bindings.<originalIndex>` | original index | The new 1-based index for the original parameter.
+| `<prefix>.resultset.index.<index>` | original index | The delegated column index used for result-set reads by index.
+| `<prefix>.resultset.name.<label>` | original label | The delegated column label used for result-set reads by name.
+|===
+
+Set the bare prefix key to `false` to require an exact case match, for example `findUsersByType = false`.
+A binding index of `0` or less skips that binding.
+For `REGEX` blocks, the replacement can use `${groupName}` or `$1` capture references.
+For `REGEX` blocks, escape literal question marks as `\\?` in the properties file.
+
+=== Plain rewrite
+
+This example swaps the two parameters of a prepared statement.
+
+[source,properties]
+----
+findUsersByType.sql.matching = select id, name from some_users where id like ? and type = ?
+findUsersByType.sql.replacing = select id, name from some_users where type = ? and id like ?
+findUsersByType.bindings.1 = 2
+findUsersByType.bindings.2 = 1
+----
+
+After this rewrite, the application binding 1 is sent as parameter 2, and the application binding 2 is sent as parameter 1.
+
+=== Regex rewrite
+
+Use `REGEX` when generated SQL contains names that are known only at runtime.
+
+[source,properties]
+----
+findUsersByType2.sql.matching = select foo as (?<idName>[^,]+), bar as (?<nameName>[^ ]+) from some_users where (?<idName2>[^ =]+) = \\? and (?<typeName>[^ ]+) = \\?
+findUsersByType2.sql.replacing = select id as ${idName}, name as ${nameName} from some_users where ${typeName} = ? and ${idName2} like ?
+findUsersByType2.type = REGEX
+findUsersByType2.bindings.1 = 2
+findUsersByType2.bindings.2 = 1
+----
+
+The regular expression must match the whole statement because the driver uses `Matcher.matches()`.
+
+=== Result-set remapping
+
+It is possible to remap result-set columns when the replacement SQL changes column indexes or labels.
+
+[source,properties]
+----
+findUsers.sql.matching = select id, name from some_users
+findUsers.sql.replacing = select id2, name from some_users where id <> '0001'
+findUsers.resultset.index.1 = 1
+findUsers.resultset.index.2 = 2
+findUsers.resultset.name.id = id2
+----
+
+In this example, code reading column `id` by name reads the delegated column `id2`.
+Only entries that differ from the identity mapping are needed.
+
+== Build and documentation
+
+Run the tests with Maven:
+
+[source,shell]
+----
+mvn test
+----
+
+Build the project with:
+
+[source,shell]
+----
+mvn clean package
+----
+
+Build and publish the minisite to the `gh-pages` branch with:
+
+[source,shell]
+----
+mvn clean package -Pgh-pages
+----
+
+* https://github.com/yupiik/statement-overriding-jdbc-driver[Source repository]
+* https://yupiik.github.io/statement-overriding-jdbc-driver/[Project documentation]
+
+== License
+
+This project is licensed under the https://www.apache.org/licenses/LICENSE-2.0.html[Apache License, Version 2.0].
